@@ -1,0 +1,102 @@
+---
+title: "Interactive Visualization: Adjusted Gross Revenue, Year, MPAA Rating of Top Movies (Domestic)"
+output: html_document
+date: "2025-03-24"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r message=FALSE}
+
+library(readxl)
+
+movies_data  <- read_excel("~/Desktop/Semester 2/Data Visualization/Assignments/Final Project/Top-Movie-Per-Year-Individual.xlsx")
+```
+
+## Notes
+
+The interactive plots show "Adjusted Gross" twice when hovering over a data point. I could not figure out how to correct that.
+
+### Basic/Static ggplot
+```{r message=FALSE}
+# Load packages
+library(ggplot2)
+library(dplyr)
+library(gapminder)
+library(dplyr)
+library(plotly)
+
+
+movies_data$unfactored_mpaa <- movies_data$`MPAA rating`
+
+movies_data$`MPAA rating` <- factor(movies_data$`MPAA rating`, levels = c("G", "PG", "PG-13", "R")) 
+
+movie_ggplot <-
+  ggplot(movies_data, 
+         aes(x = Year, y = `Adjusted Gross`, 
+             size = `Adjusted Gross`, 
+             fill = `MPAA rating`,
+             text = paste("Movie:", `Number 1 Release`))) +
+  geom_point(alpha = 0.5, shape = 21, stroke = 0.5, color = 'black', 
+             position = position_jitter(height = 0)) +
+  scale_y_continuous(labels = scales::dollar_format()) +
+  scale_size_continuous(range = c(1, 10), 
+                        labels = function(x) paste0(round(x / 1e9, 1), "B")) +
+  labs(title = "Adjusted Gross Revenue, Year, MPAA Rating of Top Movies (Domestic)",x = "Year", y = "Adjusted Gross (USD)") + 
+  theme_minimal() +
+  guides(fill = guide_legend(override.aes = list(size = 5)))
+
+movie_ggplot
+
+```
+
+
+# Interactive Bubble Plot
+### Full Plot Title: Comparing Adjusted Gross Revenue of Top Movies (Domestic): Year and MPAA Rating
+
+(plotly cut off the rest of the title and didn't know how to fix)
+
+```{r message=FALSE}
+plotly_interactive <- ggplotly(movie_ggplot)
+
+#plotly_interactive <- plotly::style(plotly_interactive, marker = list(line = list(width = 0.5)))
+
+plotly_interactive
+
+```
+
+
+
+# Alternative Interactive Scatter Plot
+
+```{r echo = FALSE}
+movie_ggplot2 <-
+  ggplot(movies_data, 
+         aes(x = Year, y = `Adjusted Gross`, 
+             size = `Adjusted Gross`, 
+             fill = `MPAA rating`,
+             text = paste("Movie:", `Number 1 Release`))) +
+  geom_point(alpha = 0.5, 
+             position = position_jitter(height = 0)) +
+  scale_y_continuous(labels = scales::dollar_format()) +
+  scale_size_continuous(range = c(1, 10), 
+                        labels = function(x) paste0(round(x / 1e9, 1), "B")) +
+  labs(title = "Adjusted Gross Revenue, Year, MPAA Rating of Top Movies (Domestic)",x = "Year", y = "Adjusted Gross (USD)") + 
+  theme_minimal() +
+  guides(fill = guide_legend(override.aes = list(size = 5)))
+```
+
+
+```{r}
+plotly_interactive2 <- ggplotly(movie_ggplot2, sizes = c(10, 30))
+
+plotly_interactive2 <- plotly::style(plotly_interactive2, marker = list(line = list(width = 0.5)))
+
+plotly_interactive2
+
+```
+
+
